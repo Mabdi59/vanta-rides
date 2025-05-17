@@ -97,4 +97,15 @@ public class JdbcUserDao implements UserDao {
         user.setActivated(true);
         return user;
     }
+    public boolean updatePassword(String username, String newPassword) {
+        String sql = "UPDATE users SET password_hash = ? WHERE username = LOWER(TRIM(?))";
+        String hashed = new BCryptPasswordEncoder().encode(newPassword);
+        try {
+            int rowsAffected = jdbcTemplate.update(sql, hashed, username);
+            return rowsAffected == 1;
+        } catch (Exception e) {
+            throw new DaoException("Unable to update password", e);
+        }
+    }
+
 }
